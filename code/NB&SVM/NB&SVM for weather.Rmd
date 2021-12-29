@@ -1,0 +1,100 @@
+---
+title: "NB and SVM for weather"
+author: "Ying Liu"
+date: "11/13/2020"
+output: html_document
+---
+
+```{r,message=FALSE,warning=FALSE}
+library(rpart)
+library(rattle)
+library(randomForest)
+library(rpart.plot)
+library(RColorBrewer)
+library(Cairo)
+library(network)
+library(textmineR)
+library(igraph)
+library(lsa)
+```
+
+###  Read in and prepare the data.
+
+```{r}
+RecordDataPath="/Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/dataset/data/covid19_by_weather.csv"
+RecordDF=read.csv(RecordDataPath)
+head(RecordDF)   ## label here is called "Label"
+str(RecordDF$Label)
+```
+
+
+### Create Training and Testing data
+
+```{r}
+(every2_indexes<-seq(1,nrow(RecordDF),2))
+RecordDF_Test<-RecordDF[-every2_indexes, ]
+RecordDF_Train<-RecordDF[every2_indexes, ]
+
+# categorize the data
+RecordDF_Test$X1.week...increase.cat <- cut(RecordDF_Test$X1.week...increase, breaks=2, labels=c("quick","slow"))
+RecordDF_Test$ConfirmedSum.cat <- cut(RecordDF_Test$ConfirmedSum, breaks=2, labels=c("large","small"))
+RecordDF_Test$DeathsSum.cat <- cut(RecordDF_Test$DeathsSum, breaks=2, labels=c("large","small"))
+RecordDF_Test$RecoveredSum.cat <- cut(RecordDF_Test$RecoveredSum, breaks=2, labels=c("large","small"))
+
+RecordDF_Train$X1.week...increase.cat <- cut(RecordDF_Train$X1.week...increase, breaks=2, labels=c("quick","slow"))
+RecordDF_Train$ConfirmedSum.cat <- cut(RecordDF_Train$ConfirmedSum, breaks=2, labels=c("large","small"))
+RecordDF_Train$DeathsSum.cat <- cut(RecordDF_Train$DeathsSum, breaks=2, labels=c("large","small"))
+RecordDF_Train$RecoveredSum.cat <- cut(RecordDF_Train$RecoveredSum, breaks=2, labels=c("large","small"))
+
+# check
+head(RecordDF_Test)
+head(RecordDF_Train)
+
+# set the test and train dataset
+RecordDF_Cat_DT_Train<-RecordDF_Train[,-c(1,2,3,4,5,6)]
+RecordDF_Cat_DT_Train <- data.frame(RecordDF_Cat_DT_Train)
+RecordDF_label = RecordDF_Test$Label
+RecordDF_Cat_DT_Test<-RecordDF_Test[,-c(1,2,3,4,5,6,7)]
+
+(head(RecordDF_Cat_DT_Train))
+(head(RecordDF_Cat_DT_Test))
+```
+
+### naiveBayes
+
+```{r}
+fitR <- naiveBayes(RecordDF_Cat_DT_Train$Label ~ X1.week...increase.cat + ConfirmedSum.cat + DeathsSum.cat + RecoveredSum.cat, data = RecordDF_Cat_DT_Train, method="class", control = rpart.control(minsplit = 1, minbucket = 1, cp = 0.001)
+)
+summary(fitR)
+```
+
+### SVM
+
+```{r}
+fitR2 <- svm(RecordDF_Cat_DT_Train$Label ~ X1.week...increase.cat + ConfirmedSum.cat + DeathsSum.cat + RecoveredSum.cat, data = RecordDF_Cat_DT_Train, kernel="polynomial", cost=.1, 
+               scale=FALSE
+)
+summary(fitR2)
+```
+
+### Predict the Test set
+
+```{r}
+predictedR= predict(fitR,RecordDF_Cat_DT_Test, type="class")
+## Confusion Matrix
+table(predictedR,RecordDF_label)
+## VIS..................
+plot(RecordDF_label, main = "True labels", col = c("dark red", "pink"))
+plot(predictedR, main = "Predicted labels", col = c("orange", 'blue'))
+```
+
+### Predict the Test set for SVM
+
+```{r}
+predictedR2= predict(fitR2,RecordDF_Cat_DT_Test, type="class")
+## Confusion Matrix
+table(predictedR2,RecordDF_label)
+## VIS..................
+plot(RecordDF_label, main = "True labels", col = c("dark red", "pink"))
+plot(predictedR2, main = "Predicted labels", col = c("orange", 'blue'))
+```

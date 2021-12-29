@@ -1,0 +1,64 @@
+{\rtf1\ansi\ansicpg936\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red62\green62\blue62;\red6\green0\blue135;\red158\green0\blue3;
+\red181\green118\blue12;\red11\green66\blue19;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx528\tx1056\tx1584\tx2112\tx2640\tx3168\tx3696\tx4224\tx4752\tx5280\tx5808\tx6337\tx6865\tx7393\tx7921\tx8449\tx8977\tx9505\tx10033\tx10561\tx11089\tx11617\tx12145\tx12674\tx13202\tx13730\tx14258\tx14786\tx15314\tx15842\tx16370\tx16898\tx17426\tx17954\tx18483\tx19011\tx19539\tx20067\tx20595\tx21123\tx21651\tx22179\tx22707\tx23235\tx23763\tx24291\tx24820\tx25348\tx25876\tx26404\tx26932\tx27460\tx27988\tx28516\tx29044\tx29572\tx30100\tx30628\tx31157\tx31685\tx32213\tx32741\tx33269\tx33797\li80\fi-80\pardirnatural\partightenfactor0
+
+\f0\fs22 \cf2 # Read csv file with baby names and make new column names\
+\cf0 COVID19\cf3  = read.csv(\cf4 "/Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/dataset/data/COVID19.csv"\cf3 , \cf0 header\cf3 =\cf5 FALSE\cf3 , \cf0 stringsAsFactors\cf3 =\cf5 FALSE\cf3 )\
+names(\cf0 COVID19\cf3 ) = c(\cf4 "Countries"\cf3 , \cf4 "Confirmed"\cf3 ,\cf4 "Deaths"\cf3 ,\cf4 "Recovered"\cf3 , \cf4 "Active"\cf3 ,\cf4 "New cases"\cf3 ,\cf4 "New deaths"\cf3 , \cf4 "New recovered"\cf3 ,\cf4 "Deaths / 100 Cases"\cf3 ,\cf4 "Recovered / 100 Cases"\cf3 ,\cf4 "Deaths / 100 Recovered"\cf3 , \cf4 "Confirmed last week"\cf3 , \cf4 "1 week change"\cf3 , \cf4 "1 week % increase"\cf3 ,\cf4 "WHO Region"\cf3 )\
+(head(\cf0 COVID19\cf3 , \cf0 n\cf3 =\cf6 5\cf3 )) \
+\
+\cf2 # delete the first row\
+\cf0 COVID19\cf3  <- \cf0 COVID19\cf3 [\cf6 -1\cf3 ,]\
+\
+\cf2 # Look at the data types for the variables in the dataset and correct them\
+\cf3 str(\cf0 COVID19\cf3 )\
+\cf2 ## Change the data types for the variables and update the dataset\
+\cf0 COVID19\cf3 $\cf0 Confirmed\cf3 =as.numeric(\cf0 COVID19\cf3 $\cf0 Confirmed\cf3 )\
+\cf0 COVID19\cf3 $\cf0 Deaths\cf3 =as.numeric(\cf0 COVID19\cf3 $\cf0 Deaths\cf3 )\
+\cf0 COVID19\cf3 $\cf0 Recovered\cf3 =as.numeric(\cf0 COVID19\cf3 $\cf0 Recovered\cf3 ) \
+\cf0 COVID19\cf3 $\cf4 `New cases`\cf3 =as.numeric(\cf0 COVID19\cf3 $\cf4 `New cases`\cf3 )\
+\cf0 COVID19\cf3 $\cf4 `New deaths`\cf3 =as.numeric(\cf0 COVID19\cf3 $\cf4 `New deaths`\cf3 )\
+\cf0 COVID19\cf3 $\cf4 `New recovered`\cf3 =as.numeric(\cf0 COVID19\cf3 $\cf4 `New recovered`\cf3 )\
+\cf0 COVID19\cf3 $\cf4 `Confirmed last week`\cf3 =as.numeric(\cf0 COVID19\cf3 $\cf4 `Confirmed last week`\cf3 )\
+\cf0 COVID19\cf3 $\cf4 `1 week % increase`\cf3 =as.numeric(\cf0 COVID19\cf3 $\cf4 `1 week % increase`\cf3 )\
+\
+str(\cf0 COVID19\cf3 )\
+\
+\cf2 # Aggregate relevant columns\
+\cf0 COVID19\cf3 $\cf0 ConfirmedSum\cf3  = \cf0 COVID19\cf3 $\cf0 Confirmed\cf3  + \cf0 COVID19\cf3 $\cf4 `New cases`\cf3  + \cf0 COVID19\cf3 $\cf4 `Confirmed last week`\cf3  \
+\cf0 COVID19\cf3 $\cf0 DeathsSum\cf3  = \cf0 COVID19\cf3 $\cf0 Deaths\cf3  + \cf0 COVID19\cf3 $\cf4 `New deaths`\cf3  \
+\cf0 COVID19\cf3 $\cf0 RecoveredSum\cf3  = \cf0 COVID19\cf3 $\cf0 Recovered\cf3  + \cf0 COVID19\cf3 $\cf4 `New recovered`\cf3  \
+\
+\cf2 # remove irrelevant columns\
+\cf0 COVID19\cf3 = subset(\cf0 COVID19\cf3 , \cf0 select\cf3  = -c(\cf0 Confirmed\cf3 , \cf0 Deaths\cf3 , \cf0 Recovered\cf3 , \cf4 `New cases`\cf3 , \cf4 `Confirmed last week`\cf3 , \cf4 `New deaths`\cf3 , \cf4 `New recovered`\cf3 , \cf0 Active\cf3 , \cf4 `Deaths / 100 Cases`\cf3 , \cf4 `Recovered / 100 Cases`\cf3 , \cf4 `Deaths / 100 Recovered`\cf3 , \cf4 `1 week change`\cf3 ))\
+(head(\cf0 COVID19\cf3 , \cf0 n\cf3 =\cf6 5\cf3 )) \
+\
+\cf2 # Delete all rows that contain NA values\
+\cf0 COVID19\cf3  = \cf0 COVID19\cf3 [complete.cases(\cf0 COVID19\cf3 ),]\
+\
+\cf2 # find covid-19 data of five countries\
+\cf3 rownames(\cf0 COVID19\cf3 ) = \cf0 COVID19\cf3 $\cf0 Countries\cf3 \
+\cf0 COVID19_five\cf3  = \cf0 COVID19\cf3 [c(\cf4 'Australia'\cf3 ,\cf4 'China'\cf3 ,\cf4 'Egypt'\cf3 ,\cf4 'US'\cf3 ,\cf4 'United Kingdom'\cf3 ),]\
+\cf0 COVID19_five\cf3 \
+\
+\cf2 # Discretization\
+\cf3 library(\cf0 dplyr\cf3 )\
+\
+\cf2 # 1. COVID19 dataset labeled by AQI data\
+\cf0 COVID19_five\cf3 $\cf0 Label\cf3  = c(\cf4 "AQI at or above average"\cf3 , \cf4 "AQI at or above average"\cf3 , \cf4 "AQI below average"\cf3 , \cf4 "AQI at or above average"\cf3 , \cf4 "AQI at or above average"\cf3 )\
+\cf0 file\cf3  = \cf4 "/Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/dataset/data/covid19_by_aqi.csv"\cf3 \
+write.csv(\cf0 COVID19_five\cf3 , \cf0 file\cf3 , \cf0 row.names\cf3  = \cf5 FALSE\cf3 )\
+\
+\cf2 # 2. COVID19 dataset labeled by WQI data\
+\cf0 COVID19_five\cf3 $\cf0 Label\cf3  = c(\cf4 "WQI below average"\cf3 , \cf4 "WQI at or above average"\cf3 , \cf4 "WQI at or above average"\cf3 , \cf4 "WQI below average"\cf3 , \cf4 "WQI at or above average"\cf3 )\
+\cf0 file\cf3  = \cf4 "/Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/dataset/data/covid19_by_wqi.csv"\cf3 \
+write.csv(\cf0 COVID19_five\cf3 , \cf0 file\cf3 , \cf0 row.names\cf3  = \cf5 FALSE\cf3 )\
+\
+\cf2 # 3. COVID19 dataset labeled by Weather data\
+\cf0 COVID19_five\cf3 $\cf0 Label\cf3  = c(\cf4 "windgust at or above average"\cf3 , \cf4 "windgust at or above average"\cf3 , \cf4 "windgust below average"\cf3 , \cf4 "windgust below average"\cf3 , \cf4 "windgust at or above average"\cf3 )\
+\cf0 file\cf3  = \cf4 "/Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/dataset/data/covid19_by_weather.csv"\cf3 \
+write.csv(\cf0 COVID19_five\cf3 , \cf0 file\cf3 , \cf0 row.names\cf3  = \cf5 FALSE\cf3 )\
+}

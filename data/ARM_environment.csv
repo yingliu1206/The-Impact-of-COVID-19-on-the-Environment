@@ -1,0 +1,5 @@
+1,"covid19 below average","AQI at or above average","windgust at or above average","WQI below average"
+2,"covid19 at or above average","AQI at or above average","windgust at or above average","WQI at or above average"
+3,"covid19 below average","AQI below average","windgust below average","WQI at or above average"
+4,"covid19 at or above average","AQI at or above average","windgust below average","WQI below average"
+5,"covid19 below average","AQI at or above average","windgust at or above average","WQI at or above average"

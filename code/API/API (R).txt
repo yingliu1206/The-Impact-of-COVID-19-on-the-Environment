@@ -1,0 +1,193 @@
+## install packages
+library(httr)
+library(jsonlite)
+
+## Get the data
+## BUILD THE URL
+url <- paste0("https://data.sa.gov.au/data/api/3/action/",
+              "datastore_search?",
+              "resource_id=92501fd8-0327-437c-99e0-7a24a9c03053")
+
+page <- GET(url) # API request
+status_code(page) # Check that the call is successful
+
+output: 
+[1] 200  # This means it was successful
+
+# Download the JSON data and convert to an R list
+WQI_list <- fromJSON(url)
+
+# Extract the actual data from the list
+WQI_list <- WQI_list$result$records
+print(WQI_list, width = 50)
+
+output:
+   Comment Aesthetic Guideline * Region Name Average Value Health Guideline * Disinfection
+1                             NG        Eyre         225.0                 NG     Chlorine
+2                             NG        Eyre         274.0                 NG     Chlorine
+3                             NG        Eyre          43.4                 NG     Chlorine
+4                             NG        Eyre           0.0                 NG     Chlorine
+5                          250.0        Eyre         109.0                 NG     Chlorine
+6                           15.0        Eyre            <1                 NG     Chlorine
+7                             NG        Eyre            NA                0.0     Chlorine
+8                             NG        Eyre           1.0                1.5     Chlorine
+9                          200.0        Eyre         234.0                 NG     Chlorine
+10                           0.3        Eyre        0.0011                 NG     Chlorine
+11                            NG        Eyre        0.0004               0.01     Chlorine
+12                            NG        Eyre          30.5                 NG     Chlorine
+13                           0.1        Eyre        0.0002                0.5     Chlorine
+14                     6.5 - 8.5        Eyre           7.9                 NG     Chlorine
+15                            NG        Eyre          5.55                 NG     Chlorine
+16                           0.6        Eyre           1.0                5.0     Chlorine
+17                            NG        Eyre          <0.1                5.0     Chlorine
+18                            NG        Eyre           1.0                5.0     Chlorine
+19                         180.0        Eyre          68.2                 NG     Chlorine
+20                         250.0        Eyre          21.3                 NG     Chlorine
+21                         600.0        Eyre         452.0                 NG     Chlorine
+22                            NG        Eyre          18.0              250.0     Chlorine
+23                           5.0        Eyre          <0.1                 NG     Chlorine
+24                           3.0        Eyre        0.0067                 NG     Chlorine
+25                            NG        Eyre         234.0                 NG     Chlorine
+26                           3.0        Eyre        0.0116                 NG     Chlorine
+27                            NG        Eyre         16.38                 NG     Chlorine
+28                            NG        Eyre          23.4                 NG     Chlorine
+29                            NG        Eyre          13.1                 NG     Chlorine
+30                            NG        Eyre         231.0                 NG     Chlorine
+31                            NG        Eyre         282.0                 NG     Chlorine
+32                            NG        Eyre          58.9                 NG     Chlorine
+33                            NG        Eyre           0.0                 NG     Chlorine
+34                         250.0        Eyre         245.0                 NG     Chlorine
+35                          15.0        Eyre            <1                 NG     Chlorine
+36                            NG        Eyre            NA                0.0     Chlorine
+37                            NG        Eyre           0.6                1.5     Chlorine
+38                         200.0        Eyre         291.0                 NG     Chlorine
+39                           0.3        Eyre        0.0009                 NG     Chlorine
+40                            NG        Eyre        0.0001               0.01     Chlorine
+41                            NG        Eyre          35.0                 NG     Chlorine
+42                           0.1        Eyre       <0.0001                0.5     Chlorine
+43                     6.5 - 8.5        Eyre           7.7                 NG     Chlorine
+44                            NG        Eyre          4.84                 NG     Chlorine
+45                           0.6        Eyre           0.9                5.0     Chlorine
+46                            NG        Eyre          <0.1                5.0     Chlorine
+47                            NG        Eyre           0.9                5.0     Chlorine
+48                         180.0        Eyre         146.0                 NG     Chlorine
+49                         250.0        Eyre          37.5                 NG     Chlorine
+50                         600.0        Eyre         740.0                 NG     Chlorine
+51                            NG        Eyre          11.0              250.0     Chlorine
+52                           5.0        Eyre          <0.1                 NG     Chlorine
+53                            NG        Eyre         291.0                 NG     Chlorine
+54                            NG        Eyre         20.37                 NG     Chlorine
+55                            NG        Eyre          29.1                 NG     Chlorine
+56                            NG        Eyre          16.3                 NG     Chlorine
+57                            NG        Eyre         233.0                 NG     Chlorine
+58                            NG        Eyre         284.0                 NG     Chlorine
+59                            NG        Eyre          69.1                 NG     Chlorine
+60                            NG        Eyre           0.0                 NG     Chlorine
+61                         250.0        Eyre         155.0                 NG     Chlorine
+62                          15.0        Eyre            <1                 NG     Chlorine
+63                            NG        Eyre            NA                0.0     Chlorine
+64                            NG        Eyre           0.5                1.5     Chlorine
+65                         200.0        Eyre         263.0                 NG     Chlorine
+66                           0.3        Eyre        0.0021                 NG     Chlorine
+67                            NG        Eyre        0.0005               0.01     Chlorine
+68                            NG        Eyre          21.9                 NG     Chlorine
+69                           0.1        Eyre       <0.0001                0.5     Chlorine
+70                     6.5 - 8.5        Eyre           7.6                 NG     Chlorine
+71                            NG        Eyre          2.74                 NG     Chlorine
+72                           0.6        Eyre           1.0                5.0     Chlorine
+73                            NG        Eyre          <0.1                5.0     Chlorine
+74                            NG        Eyre           1.0                5.0     Chlorine
+75                         180.0        Eyre          95.6                 NG     Chlorine
+76                         250.0        Eyre          25.2                 NG     Chlorine
+77                         600.0        Eyre         565.0                 NG     Chlorine
+78                            NG        Eyre          23.0              250.0     Chlorine
+79                           5.0        Eyre          <0.1                 NG     Chlorine
+80                           3.0        Eyre        0.0099                 NG     Chlorine
+81                            NG        Eyre         263.0                 NG     Chlorine
+82                            NG        Eyre         18.41                 NG     Chlorine
+83                            NG        Eyre          26.3                 NG     Chlorine
+            Date Range System Name Health Compliance #       Units _id                  Parameter
+1  2019-01-06T20:20:00  Coffin Bay                  NA        mg/L   1                 Alkalinity
+2  2019-01-06T20:20:00  Coffin Bay                  NA        mg/L   2                Bicarbonate
+3  2019-01-06T20:20:00  Coffin Bay                  NA        mg/L   3                    Calcium
+4  2019-01-06T20:20:00  Coffin Bay                  NA        mg/L   4                  Carbonate
+5  2019-01-06T20:20:00  Coffin Bay                  NA        mg/L   5                   Chloride
+6  2019-01-06T20:20:00  Coffin Bay                  NA          HU   6                     Colour
+7  2019-01-06T20:20:00  Coffin Bay                 1.0   cfu/100mL   7                    E. coli
+8  2019-01-06T20:20:00  Coffin Bay                 1.0        mg/L   8                   Fluoride
+9  2019-01-06T20:20:00  Coffin Bay                  NA        mg/L   9                   Hardness
+10 2019-01-06T20:20:00  Coffin Bay                  NA        mg/L  10                       Iron
+11 2019-01-06T20:20:00  Coffin Bay                 1.0        mg/L  11               Lead - Total
+12 2019-01-06T20:20:00  Coffin Bay                  NA        mg/L  12                  Magnesium
+13 2019-01-06T20:20:00  Coffin Bay                 1.0        mg/L  13                  Manganese
+14 2019-01-06T20:20:00  Coffin Bay                  NA    pH units  14                         pH
+15 2019-01-06T20:20:00  Coffin Bay                  NA        mg/L  15                  Potassium
+16 2019-01-06T20:20:00  Coffin Bay                 1.0        mg/L  16     Residual Free Chlorine
+17 2019-01-06T20:20:00  Coffin Bay                 1.0        mg/L  17    Residual Monochloramine
+18 2019-01-06T20:20:00  Coffin Bay                 1.0        mg/L  18    Residual Total Chlorine
+19 2019-01-06T20:20:00  Coffin Bay                  NA        mg/L  19                     Sodium
+20 2019-01-06T20:20:00  Coffin Bay                  NA        mg/L  20                   Sulphate
+21 2019-01-06T20:20:00  Coffin Bay                  NA        mg/L  21     Total Dissolved Solids
+22 2019-01-06T20:20:00  Coffin Bay                 1.0        µg/L  22            Trihalomethanes
+23 2019-01-06T20:20:00  Coffin Bay                  NA         NTU  23                  Turbidity
+24 2019-01-06T20:20:00  Coffin Bay                  NA        mg/L  24                       Zinc
+25 2019-01-06T20:20:00  Coffin Bay                  NG PPM or mg/L  25   Hardness - International
+26 2019-01-06T20:20:00    Elliston                  NA        mg/L  52                       Zinc
+27 2019-01-06T20:20:00  Coffin Bay                  NG         °e  26 Hardness - English Degrees
+28 2019-01-06T20:20:00  Coffin Bay                  NG         °f  27  Hardness - French Degrees
+29 2019-01-06T20:20:00  Coffin Bay                  NG        °dH  28  Hardness - German Degrees
+30 2019-01-06T20:20:00    Elliston                  NA        mg/L  29                 Alkalinity
+31 2019-01-06T20:20:00    Elliston                  NA        mg/L  30                Bicarbonate
+32 2019-01-06T20:20:00    Elliston                  NA        mg/L  31                    Calcium
+33 2019-01-06T20:20:00    Elliston                  NA        mg/L  32                  Carbonate
+34 2019-01-06T20:20:00    Elliston                  NA        mg/L  33                   Chloride
+35 2019-01-06T20:20:00    Elliston                  NA          HU  34                     Colour
+36 2019-01-06T20:20:00    Elliston                 1.0   cfu/100mL  35                    E. coli
+37 2019-01-06T20:20:00    Elliston                 1.0        mg/L  36                   Fluoride
+38 2019-01-06T20:20:00    Elliston                  NA        mg/L  37                   Hardness
+39 2019-01-06T20:20:00    Elliston                  NA        mg/L  38                       Iron
+40 2019-01-06T20:20:00    Elliston                 1.0        mg/L  39               Lead - Total
+41 2019-01-06T20:20:00    Elliston                  NA        mg/L  40                  Magnesium
+42 2019-01-06T20:20:00    Elliston                 1.0        mg/L  41                  Manganese
+43 2019-01-06T20:20:00    Elliston                  NA    pH units  42                         pH
+44 2019-01-06T20:20:00    Elliston                  NA        mg/L  43                  Potassium
+45 2019-01-06T20:20:00    Elliston                 1.0        mg/L  44     Residual Free Chlorine
+46 2019-01-06T20:20:00    Elliston                 1.0        mg/L  45    Residual Monochloramine
+47 2019-01-06T20:20:00    Elliston                 1.0        mg/L  46    Residual Total Chlorine
+48 2019-01-06T20:20:00    Elliston                  NA        mg/L  47                     Sodium
+49 2019-01-06T20:20:00    Elliston                  NA        mg/L  48                   Sulphate
+50 2019-01-06T20:20:00    Elliston                  NA        mg/L  49     Total Dissolved Solids
+51 2019-01-06T20:20:00    Elliston                 1.0        µg/L  50            Trihalomethanes
+52 2019-01-06T20:20:00    Elliston                  NA         NTU  51                  Turbidity
+53 2019-01-06T20:20:00    Elliston                  NG PPM or mg/L  53   Hardness - International
+54 2019-01-06T20:20:00    Elliston                  NG         °e  54 Hardness - English Degrees
+55 2019-01-06T20:20:00    Elliston                  NG         °f  55  Hardness - French Degrees
+56 2019-01-06T20:20:00    Elliston                  NG        °dH  56  Hardness - German Degrees
+57 2019-01-06T20:20:00  Eyre South                  NA        mg/L  57                 Alkalinity
+58 2019-01-06T20:20:00  Eyre South                  NA        mg/L  58                Bicarbonate
+59 2019-01-06T20:20:00  Eyre South                  NA        mg/L  59                    Calcium
+60 2019-01-06T20:20:00  Eyre South                  NA        mg/L  60                  Carbonate
+61 2019-01-06T20:20:00  Eyre South                  NA        mg/L  61                   Chloride
+62 2019-01-06T20:20:00  Eyre South                  NA          HU  62                     Colour
+63 2019-01-06T20:20:00  Eyre South                 1.0   cfu/100mL  63                    E. coli
+64 2019-01-06T20:20:00  Eyre South                 1.0        mg/L  64                   Fluoride
+65 2019-01-06T20:20:00  Eyre South                  NA        mg/L  65                   Hardness
+66 2019-01-06T20:20:00  Eyre South                  NA        mg/L  66                       Iron
+67 2019-01-06T20:20:00  Eyre South                 1.0        mg/L  67               Lead - Total
+68 2019-01-06T20:20:00  Eyre South                  NA        mg/L  68                  Magnesium
+69 2019-01-06T20:20:00  Eyre South                 1.0        mg/L  69                  Manganese
+70 2019-01-06T20:20:00  Eyre South                  NA    pH units  70                         pH
+71 2019-01-06T20:20:00  Eyre South                  NA        mg/L  71                  Potassium
+72 2019-01-06T20:20:00  Eyre South                 1.0        mg/L  72     Residual Free Chlorine
+73 2019-01-06T20:20:00  Eyre South                 1.0        mg/L  73    Residual Monochloramine
+74 2019-01-06T20:20:00  Eyre South                 1.0        mg/L  74    Residual Total Chlorine
+75 2019-01-06T20:20:00  Eyre South                  NA        mg/L  75                     Sodium
+76 2019-01-06T20:20:00  Eyre South                  NA        mg/L  76                   Sulphate
+77 2019-01-06T20:20:00  Eyre South                  NA        mg/L  77     Total Dissolved Solids
+78 2019-01-06T20:20:00  Eyre South                 1.0        µg/L  78            Trihalomethanes
+79 2019-01-06T20:20:00  Eyre South                  NA         NTU  79                  Turbidity
+80 2019-01-06T20:20:00  Eyre South                  NA        mg/L  80                       Zinc
+81 2019-01-06T20:20:00  Eyre South                  NG PPM or mg/L  81   Hardness - International
+82 2019-01-06T20:20:00  Eyre South                  NG         °e  82 Hardness - English Degrees
+83 2019-01-06T20:20:00  Eyre South                  NG         °f  83  Hardness - French Degrees
+ [ reached 'max' / getOption("max.print") -- omitted 17 rows ]

@@ -1,0 +1,4 @@
+              date country    pH  ...  Temp Water  Oxygen Diss  N Oxidised
+0  2020.01-2020.08      UK  61.0  ...        76.0       9924.0       116.0
+
+[1 rows x 9 columns]

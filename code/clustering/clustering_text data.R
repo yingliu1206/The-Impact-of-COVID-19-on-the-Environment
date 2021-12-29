@@ -1,0 +1,189 @@
+library(NLP)
+library(tm)
+# #install.packages("tm")
+# library(stringr)
+library(RColorBrewer)
+library(wordcloud)
+# library(SnowballC)
+# library(caTools)
+# library(dplyr)
+# install.packages('textstem')
+library(textstem)  ## Needed for lemmatize_strings
+
+
+## Next, load in the documents ( from the corpus)
+Corpus <- Corpus(DirSource("/Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/dataset/data/corpus"))
+(getTransformations()) ## These work with library tm
+(ndocs<-length(Corpus))
+
+## Do some clean-up.............
+Corpus <- tm_map(Corpus, content_transformer(tolower))
+Corpus <- tm_map(Corpus, removePunctuation)
+## Remove all Stop Words
+Corpus <- tm_map(Corpus, removeWords, stopwords("english"))
+
+## remove words that I do not want
+MyStopWords <- c("and","like", "very", "can", "I", "also", "lot")
+Corpus <- tm_map(Corpus, removeWords, MyStopWords)
+Corpus <- tm_map(Corpus, lemmatize_strings)
+##-------------------------------------------------------------
+
+## Convert to Document Term Matrix  and TERM document matrix
+## Each has its own purpose.
+
+## DOCUMENT Term Matrix  (Docs are rows)
+Corpus_DTM <- DocumentTermMatrix(Corpus,
+                                 control = list(
+                                 stopwords = TRUE, ## remove normal stopwords
+                                 wordLengths=c(3, 10), ## get rid of words of len 2 or smaller or larger than 15
+                                 removePunctuation = TRUE,
+                                 removeNumbers = TRUE,
+                                 tolower=TRUE
+                                 #stemming = TRUE,
+                                 ))
+
+inspect(Corpus_DTM)
+
+## TERM Document Matrix  (words are rows)
+Corpus_TERM_DM <- TermDocumentMatrix(Corpus,
+                                     control = list(
+                                     stopwords = TRUE, ## remove normal stopwords
+                                     wordLengths=c(3, 10), ## get rid of words of len 2 or smaller or larger than 15
+                                     removePunctuation = TRUE,
+                                     removeNumbers = TRUE,
+                                     tolower=TRUE
+                                     #stemming = TRUE,
+                                    ))
+
+inspect(Corpus_TERM_DM)
+
+###-----------------------
+## Convert to DF 
+##------------------------
+(inspect(Corpus_DTM))
+Corpus_DF_DT <- as.data.frame(as.matrix(Corpus_DTM))
+
+(inspect(Corpus_TERM_DM))
+Corpus_DF_TermDoc <- as.data.frame(as.matrix(Corpus_TERM_DM))
+
+############ Data frames are useful in R
+Corpus_DF_DT$change   ## Num of times "change" occurs in each of the 6 docs
+
+##--------------------
+## COnvert to matrix 
+## -----------------------
+SC_DTM_mat <- as.matrix(Corpus_DTM)
+(SC_DTM_mat[1:6,1:10])
+
+SC_TERM_Doc_mat <- as.matrix(Corpus_TERM_DM)
+(SC_TERM_Doc_mat[1:10,1:6])
+
+## WORDCLOUD ##_---------------------------------------
+word.freq <- sort(rowSums(SC_TERM_Doc_mat), decreasing = T)
+wordcloud(words = names(word.freq), freq = word.freq*2, min.freq = 2,
+          random.order = F, rot.per=0.35,
+          min_font_size=5, max_font_size=10, font_step=0.1,
+          colors=brewer.pal(8, "Dark2"))
+
+## -----------------------------
+## Get Frequencies and sums
+## -----------------------------------
+(CorpusWordFreq <- colSums(SC_DTM_mat))
+## Order and sum..
+(head(CorpusWordFreq))
+(length(CorpusWordFreq))
+ord <- order(CorpusWordFreq)
+(CorpusWordFreq[head(ord)]) ## least frequent
+(CorpusWordFreq[tail(ord)])  ## most frequent
+## Row Sums
+(Row_Sum_Per_doc <- rowSums((SC_DTM_mat)))  ## total words in each row (doc)
+
+#### Create your own normalization function to divide 
+#### the frequency of each word in each row
+#### by the sum of the words in that row.
+
+SC_DTM_mat_norm <- apply(SC_DTM_mat, 1, function(i) round(i/sum(i),2))
+(SC_DTM_mat_norm[1:12,1:6])
+
+##############################  Clustering Text Docs
+## k means and hclust
+##
+####################################################
+## We have many formats of our data.
+## We have a normalized DTM: SC_DTM_mat_norm
+## We have data frames: SmallCorpus_DF_DT   and SmallCorpus_DF_TermDoc
+## We have the Term Doc Matrix...SC_TERM_Doc_mat 
+#####################################################################
+library(plotly)
+library(NbClust)
+library(factoextra)
+
+## k means - HOW MANY Clusters?
+# find the optimal k. 
+## Silhouette method
+fviz_nbclust(Corpus_DF_DT, method = "silhouette", 
+             FUN = hcut, k.max = 5)
+### It shows two is the optimal value, so we can cluster the data into 2 clusters.
+
+## Elbow method
+fviz_nbclust(
+  as.matrix(Corpus_DF_DT), 
+  kmeans, 
+  k.max = 5,
+  method = "wss",
+  diss = get_dist(as.matrix(Corpus_DF_DT), method = "manhattan")
+)
+### It shows two is the optimal value, so we can cluster the data into 2 clusters.
+
+## Gap-Stat method
+fviz_nbclust(Corpus_DF_DT, kmeans, method = "gap_stat",k.max = 5) # We have 6 rows, so k must be one of 1 to 5
+### It shows two is the optimal value, so we can cluster the data into 2 clusters.
+
+# Clustering with kmeans
+## k means.............on words............
+#kmeans_smallcorp_Result <- kmeans(SC_DTM_mat_norm, 6, nstart=25) 
+kmeans_smallcorp_Result <- kmeans(t(Corpus_DF_DT), 2, nstart=4) 
+
+# Print the results
+print(kmeans_smallcorp_Result)
+
+kmeans_smallcorp_Result$centers  
+
+## Place results in a tbale with the original data
+cbind(t(Corpus_DF_DT), cluster = kmeans_smallcorp_Result$cluster)
+
+## See each cluster
+kmeans_smallcorp_Result$cluster
+
+## This is the size (the number of points in) each cluster
+# Cluster size
+kmeans_smallcorp_Result$size
+## Here we have two clusters, each with 5 points (rows/vectors) 
+
+## Visualize the clusters
+fviz_cluster(kmeans_smallcorp_Result, t(Corpus_DF_DT),
+             palette = c("#2E9FDF", "#00AFBB"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+)
+
+# Clustering with hclust
+hc_D <- hclust(dE, method = "ward.D" )
+plot(hc_D)
+
+# Clustering with dbscan
+# install.packages('fpc')
+library(fpc)
+library(dbscan)
+library(factoextra)
+
+# Load the data 
+db <- fpc::dbscan(Corpus_DF_TermDoc, eps = 0.15, MinPts = 2)
+plot(db,Corpus_DF_TermDoc, main = "DBSCAN", frame = FALSE)
+
+# Use three different distance metrics
+## "euclidean", "maximum", "manhattan", 
+(dE <- dist(Corpus_DF_DT, method = "euclidean"))
+(dM <- dist(Corpus_DF_DT, method = "manhattan"))
+(dMax <- dist(Corpus_DF_DT, method = "maximum"))

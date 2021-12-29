@@ -1,0 +1,196 @@
+# install.packages('networkD3')
+library(networkD3)
+
+# transform data into transaction data in "basket" format
+environment <- read.transactions("/Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/dataset/data/ARM_environment.csv",
+                                 rm.duplicates = FALSE, 
+                                 format = "basket",  ##if you use "single" also use cols=c(1,2)
+                                 sep=",",  ## csv file
+                                 cols=1) ## The dataset HAS row numbers
+inspect(environment)
+
+### Use apriori to get the RULES
+environmentK = arules::apriori(environment, parameter = list(support=.35, 
+                                                       confidence=.5, minlen=2))
+inspect(environmentK)
+
+## Plot of which items are most frequent
+itemFrequencyPlot(environment, topN=20, type="absolute")
+
+## Sort rules by confidence
+SortedRules_conf <- sort(environmentK, by="confidence", decreasing=TRUE)
+inspect(SortedRules_conf[1:15])
+(summary(SortedRules_conf))
+
+## Sort rules by support
+SortedRules_sup <- sort(environmentK, by="support", decreasing=TRUE)
+inspect(SortedRules_sup[1:15])
+(summary(SortedRules_sup))
+
+## Sort rules by lift
+SortedRules_lift <- sort(environmentK, by="lift", decreasing=TRUE)
+inspect(SortedRules_lift[1:15])
+(summary(SortedRules_lift))
+
+## Selecting rules with LHS specified
+covidRules <- apriori(data=environment,parameter = list(supp=.001, conf=.01, minlen=2),
+                      appearance = list(default="rhs", lhs="covid19 at or above average"),
+                      control=list(verbose=FALSE))
+(covidRules <- sort(covidRules, decreasing=TRUE, by="support"))
+inspect(covidRules[1:5])
+
+covidRules <- apriori(data=environment,parameter = list(supp=.001, conf=.01, minlen=2),
+                      appearance = list(default="rhs", lhs="covid19 below average"),
+                      control=list(verbose=FALSE))
+(covidRules <- sort(covidRules, decreasing=TRUE, by="support"))
+inspect(covidRules[1:6])
+
+
+## Vis
+# vis 1
+subrulesK <- head(sort(SortedRules_sup, by="support"),10)
+plot(subrulesK)
+
+# vis 2
+plot(subrulesK, method="graph", engine="interactive")
+
+# vis 3: networkD3
+## Build node and egdes properly formatted data files
+## Build the edgeList which will have SourceName, TargetName
+##                                    Weight, SourceID, and
+##                                    TargetID
+environment_rules<-SortedRules_lift[1:20]
+inspect(environment_rules)
+
+## Convert the RULES to a DATAFRAME
+Rules_DF2<-DATAFRAME(environment_rules, separate = TRUE)
+(head(Rules_DF2))
+str(Rules_DF2)
+
+## Convert to char
+Rules_DF2$LHS<-as.character(Rules_DF2$LHS)
+Rules_DF2$RHS<-as.character(Rules_DF2$RHS)
+
+## Remove all {}
+Rules_DF2[] <- lapply(Rules_DF2, gsub, pattern='[{]', replacement='')
+Rules_DF2[] <- lapply(Rules_DF2, gsub, pattern='[}]', replacement='')
+
+head(Rules_DF2)
+
+###########################################
+###### Do for SUp, Conf, and Lift   #######
+###########################################
+## Remove the sup, conf, and count
+## USING LIFT
+Rules_L<-Rules_DF2[c(1,2,5)]
+names(Rules_L) <- c("SourceName", "TargetName", "Weight")
+head(Rules_L,30)
+
+## CHoose and set
+Rules_Sup<-Rules_L
+
+###########################################################################
+#############       Build a NetworkD3 edgeList and nodeList    ############
+###########################################################################
+
+############################### BUILD THE NODES & EDGES ####################################
+(edgeList<-Rules_Sup)
+MyGraph <- igraph::simplify(igraph::graph.data.frame(edgeList, directed=TRUE))
+
+nodeList <- data.frame(ID = c(0:(igraph::vcount(MyGraph) - 1)), 
+                       # because networkD3 library requires IDs to start at 0
+                       nName = igraph::V(MyGraph)$name)
+## Node Degree
+(nodeList <- cbind(nodeList, nodeDegree=igraph::degree(MyGraph, 
+                                                       v = igraph::V(MyGraph), mode = "all")))
+
+## Betweenness
+BetweenNess <- igraph::betweenness(MyGraph, 
+                                   v = igraph::V(MyGraph), 
+                                   directed = TRUE) 
+
+(nodeList <- cbind(nodeList, nodeBetweenness=BetweenNess))
+
+## This can change the BetweenNess value if needed
+BetweenNess<-BetweenNess/100
+
+###################################################################################
+########## BUILD THE EDGES #####################################################
+#############################################################
+# Recall that ... 
+# edgeList<-Rules_Sup
+getNodeID <- function(x){
+  which(x == igraph::V(MyGraph)$name) - 1  #IDs start at 0
+}
+
+edgeList <- plyr::ddply(
+  Rules_Sup, .variables = c("SourceName", "TargetName" , "Weight"), 
+  function (x) data.frame(SourceID = getNodeID(x$SourceName), 
+                          TargetID = getNodeID(x$TargetName)))
+
+head(edgeList)
+nrow(edgeList)
+
+########################################################################
+##############  Dice Sim ################################################
+###########################################################################
+#Calculate Dice similarities between all pairs of nodes
+#The Dice similarity coefficient of two vertices is twice 
+#the number of common neighbors divided by the sum of the degrees 
+#of the vertices. Method dice calculates the pairwise Dice similarities 
+#for some (or all) of the vertices. 
+DiceSim <- igraph::similarity.dice(MyGraph, vids = igraph::V(MyGraph), mode = "all")
+head(DiceSim)
+
+#Create  data frame that contains the Dice similarity between any two vertices
+F1 <- function(x) {data.frame(diceSim = DiceSim[x$SourceID +1, x$TargetID + 1])}
+#Place a new column in edgeList with the Dice Sim
+head(edgeList)
+edgeList <- plyr::ddply(edgeList,
+                        .variables=c("SourceName", "TargetName", "Weight", 
+                                     "SourceID", "TargetID"), 
+                        function(x) data.frame(F1(x)))
+head(edgeList)
+
+##################################################################################
+##################   color #################################################
+######################################################
+COLOR_P <- colorRampPalette(c("#00FF00", "#FF0000"), 
+                            bias = nrow(edgeList), space = "rgb", 
+                            interpolate = "linear")
+COLOR_P
+(colCodes <- COLOR_P(length(unique(edgeList$diceSim))))
+edges_col <- sapply(edgeList$diceSim, 
+                    function(x) colCodes[which(sort(unique(edgeList$diceSim)) == x)])
+nrow(edges_col)
+
+## NetworkD3 Object
+#https://www.rdocumentation.org/packages/networkD3/versions/0.4/topics/forceNetwork
+
+D3_network_environment <- networkD3::forceNetwork(
+  Links = edgeList, # data frame that contains info about edges
+  Nodes = nodeList, # data frame that contains info about nodes
+  Source = "SourceID", # ID of source node 
+  Target = "TargetID", # ID of target node
+  Value = "Weight", # value from the edge list (data frame) that will be used to value/weight relationship amongst nodes
+  NodeID = "nName", # value from the node list (data frame) that contains node description we want to use (e.g., node name)
+  Nodesize = "nodeBetweenness",  # value from the node list (data frame) that contains value we want to use for a node size
+  Group = "nodeDegree",  # value from the node list (data frame) that contains value we want to use for node color
+  height = 700, # Size of the plot (vertical)
+  width = 900,  # Size of the plot (horizontal)
+  fontSize = 20, # Font size
+  linkDistance = networkD3::JS("function(d) { return d.value*10; }"), # Function to determine distance between any two nodes, uses variables already defined in forceNetwork function (not variables from a data frame)
+  linkWidth = networkD3::JS("function(d) { return d.value/10; }"),# Function to determine link/edge thickness, uses variables already defined in forceNetwork function (not variables from a data frame)
+  opacity = 0.9, # opacity
+  zoom = TRUE, # ability to zoom when click on the node
+  opacityNoHover = 0.9, # opacity of labels when static
+  linkColour = "red"   ###"edges_col"red"# edge colors
+) 
+
+# Plot network
+#D3_network_Tweets
+
+# Save network as html file
+networkD3::saveNetwork(D3_network_environment, 
+                       "NetD3_2020_environment.html", selfcontained = TRUE)
+

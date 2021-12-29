@@ -1,0 +1,135 @@
+######################## COVID data ############################
+###############################################################
+
+# Read csv file with baby names and make new column names
+COVID19 = read.csv("/Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/dataset/data/COVID19.csv", header=FALSE, stringsAsFactors=FALSE)
+names(COVID19) = c("Countries", "Confirmed","Deaths","Recovered", "Active","New cases","New deaths", "New recovered","Deaths / 100 Cases","Recovered / 100 Cases","Deaths / 100 Recovered", "Confirmed last week", "1 week change", "1 week % increase","WHO Region")
+(head(COVID19, n=5)) 
+
+# delete the first row
+COVID19 <- COVID19[-1,]
+
+# Look at the data types for the variables in the dataset and correct them
+str(COVID19)
+## Change the data types for the variables and update the dataset
+COVID19$Confirmed=as.numeric(COVID19$Confirmed)
+COVID19$Deaths=as.numeric(COVID19$Deaths)
+COVID19$Recovered=as.numeric(COVID19$Recovered) 
+COVID19$`New cases`=as.numeric(COVID19$`New cases`)
+COVID19$`New deaths`=as.numeric(COVID19$`New deaths`)
+COVID19$`New recovered`=as.numeric(COVID19$`New recovered`)
+COVID19$`Confirmed last week`=as.numeric(COVID19$`Confirmed last week`)
+COVID19$`1 week % increase`=as.numeric(COVID19$`1 week % increase`)
+
+str(COVID19)
+
+# Aggregate relevant columns
+COVID19$ConfirmedSum = COVID19$Confirmed + COVID19$`New cases` + COVID19$`Confirmed last week` 
+COVID19$DeathsSum = COVID19$Deaths + COVID19$`New deaths` 
+COVID19$RecoveredSum = COVID19$Recovered + COVID19$`New recovered` 
+
+# remove irrelevant columns
+COVID19= subset(COVID19, select = -c(Confirmed, Deaths, Recovered, `New cases`, `Confirmed last week`, `New deaths`, `New recovered`, Active, `Deaths / 100 Cases`, `Recovered / 100 Cases`, `Deaths / 100 Recovered`, `1 week change`))
+(head(COVID19, n=5)) 
+
+# Delete all rows that contain NA values
+COVID19 = COVID19[complete.cases(COVID19),]
+
+# find covid-19 data of five countries
+rownames(COVID19) = COVID19$Countries
+COVID19_five = COVID19[c('Australia','China','Egypt','US','United Kingdom'),]
+head(COVID19_five)
+
+library(ggplot2)
+library(RColorBrewer)
+coul <- brewer.pal(5, "Set2") 
+p1 <- ggplot(COVID19_five, aes(x = Countries, y = ConfirmedSum)) +
+  geom_col(fill = coul) 
+
+p2 <- ggplot(COVID19_five, aes(x = Countries, y = DeathsSum)) +
+  geom_col(fill = coul) 
+
+p3 <- ggplot(COVID19_five, aes(x = Countries, y = `1 week % increase`)) +
+  geom_col(fill = coul) 
+
+p4 <- ggplot(COVID19_five, aes(x = Countries, y = RecoveredSum)) +
+  geom_col(fill = coul) 
+
+######################## AQI data ############################
+#############################################################
+AQI = read.csv("//Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/dataset/data/airqualityNew.csv", stringsAsFactors=FALSE)
+
+ggplot(data=AQI, aes(x=country, y=pm2.5)) + 
+  geom_bar(fill = coul, stat="identity",
+           position=position_dodge(),
+           size=.3) +                        # Thinner lines
+  xlab("Counties") + ylab("pm2.5") + # Set axis labels
+  ggtitle("mean of pm2.5 in 2020.01-2020.08") +     # Set title
+  theme_bw()
+
+ggplot(data=AQI, aes(x=country, y=pm10)) + 
+  geom_bar(fill = coul, stat="identity",
+           position=position_dodge(),
+           size=.3) +                        # Thinner lines
+  xlab("Counties") + ylab("pm10") + # Set axis labels
+  ggtitle("mean of pm10 in 2020.01-2020.08") +     # Set title
+  theme_bw()
+
+ggplot(data=AQI, aes(x=country, y=co)) + 
+  geom_bar(fill = coul, stat="identity",
+           position=position_dodge(),
+           size=.3) +                        # Thinner lines
+  xlab("Counties") + ylab("co") + # Set axis labels
+  ggtitle("mean of co in 2020.01-2020.08") +     # Set title
+  theme_bw()
+
+ggplot(data=AQI, aes(x=country, y=so2)) + 
+  geom_bar(fill = coul, stat="identity",
+           position=position_dodge(),
+           size=.3) +                        # Thinner lines
+  xlab("Counties") + ylab("so2") + # Set axis labels
+  ggtitle("mean of so2 in 2020.01-2020.08") +     # Set title
+  theme_bw()
+
+ggplot(data=AQI, aes(x=country, y=o3)) + 
+  geom_bar(fill = coul, stat="identity",
+           position=position_dodge(),
+           size=.3) +                        # Thinner lines
+  xlab("Counties") + ylab("o3") + # Set axis labels
+  ggtitle("mean of o3 in 2020.01-2020.08") +     # Set title
+  theme_bw()
+
+ggplot(data=AQI, aes(x=country, y=no2)) + 
+  geom_bar(fill = coul, stat="identity",
+           position=position_dodge(),
+           size=.3) +                        # Thinner lines
+  xlab("Counties") + ylab("no2") + # Set axis labels
+  ggtitle("mean of no2 in 2020.01-2020.08") +     # Set title
+  theme_bw()
+######################## Weather ############################
+#############################################################
+weather = read.csv("/Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/dataset/data/weatherNew.csv", stringsAsFactors=FALSE)
+
+ggplot(data=weather, aes(x=country, y=dew)) + 
+  geom_bar(fill = coul, stat="identity",
+           position=position_dodge(),
+           size=.3) +                        # Thinner lines
+  xlab("Counties") + ylab("dew") + # Set axis labels
+  ggtitle("mean of dew in 2020.01-2020.08") +     # Set title
+  theme_bw()
+
+ggplot(data=weather, aes(x=country, y=humidity)) + 
+  geom_bar(fill = coul, stat="identity",
+           position=position_dodge(),
+           size=.3) +                        # Thinner lines
+  xlab("Counties") + ylab("humidity") + # Set axis labels
+  ggtitle("mean of humidity in 2020.01-2020.08") +     # Set title
+  theme_bw()
+
+ggplot(data=weather, aes(x=country, y=windgust)) + 
+  geom_bar(fill = coul, stat="identity",
+           position=position_dodge(),
+           size=.3) +                        # Thinner lines
+  xlab("Counties") + ylab("windgust") + # Set axis labels
+  ggtitle("mean of windgust in 2020.01-2020.08") +     # Set title
+  theme_bw()

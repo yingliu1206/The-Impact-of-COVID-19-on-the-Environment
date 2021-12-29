@@ -1,0 +1,189 @@
+{\rtf1\ansi\ansicpg936\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 #!/usr/bin/env python3\
+# -*- coding: utf-8 -*-\
+\
+\
+import pandas as pd\
+import sklearn\
+import re  \
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer\
+from nltk.probability import FreqDist\
+import matplotlib.pyplot as plt\
+from nltk.corpus import stopwords\
+## For Stemming\
+from nltk.tokenize import sent_tokenize, word_tokenize\
+import os\
+from sklearn.model_selection import train_test_split\
+import random as rd\
+from sklearn.naive_bayes import MultinomialNB\
+from sklearn.metrics import confusion_matrix\
+from sklearn.naive_bayes import BernoulliNB\
+from sklearn.tree import DecisionTreeClassifier\
+from sklearn import tree\
+## conda install python-graphviz\
+## restart kernel (click the little red x next to the Console)\
+import graphviz \
+import numpy as np\
+from sklearn.svm import LinearSVC\
+from sklearn.decomposition import PCA\
+#from mpl_toolkits.mplot3d import Axes3D \
+## conda install python-graphviz\
+## restart kernel (click the little red x next to the Console)\
+from sklearn.tree import export_graphviz\
+#from sklearn.externals.six import StringIO  \
+from IPython.display import Image  \
+## conda install pydotplus\
+#import pydotplus\
+from sklearn.ensemble import RandomForestClassifier\
+from sklearn.datasets import make_classification\
+#from nltk.stem import WordNetLemmatizer \
+#LEMMER = WordNetLemmatizer() \
+from nltk.stem.porter import PorterStemmer\
+import string\
+\
+\
+\
+STEMMER=PorterStemmer()\
+def MY_STEMMER(str_input):\
+    words = re.sub(r"[^A-Za-z\\']", " ", str_input).lower().split()\
+    words = [STEMMER.stem(word) for word in words]\
+    return words\
+\
+\
+\
+MyVect_STEM=CountVectorizer(input='filename',\
+                        analyzer = 'word',\
+                        stop_words='english',\
+                        ##stop_words=["and", "or", "but"],\
+                        token_pattern='(?u)[a-zA-Z]+',\
+                        #token_pattern=pattern,\
+                        tokenizer=MY_STEMMER,\
+                        #strip_accents = 'unicode', \
+                        lowercase = True\
+                        )\
+\
+\
+\
+#We will be creating new data frames\
+FinalDF_STEM=pd.DataFrame()\
+\
+\
+## This code assumes that it is in the same folder/location\
+## as the folders. It will loop through the files in\
+## these folders and will build the list needed to use\
+## CounterVectorizer. \
+\
+for name in ["environment", "policy"]: \
+\
+    builder=name+"DF"\
+    #print(builder)\
+    path = "/Users/LiuYing/Desktop/GU/2020-fall/ANLY-501-01/Discussion/discussion 6/"+name\
+    \
+    FileList=[]\
+    for item in os.listdir(path):\
+        #print(path+ "\\\\" + item)\
+        next=path+ "/" + item\
+        FileList.append(next)  \
+        print("full list...")\
+        #print(FileList)\
+        X1=MyVect_STEM.fit_transform(FileList)\
+        \
+        ColumnNames1=MyVect_STEM.get_feature_names()\
+        NumFeatures1=len(ColumnNames1)\
+\
+        #print("Column names: ", ColumnNames2)\
+        #Create a name\
+        \
+    builderS=pd.DataFrame(X1.toarray(),columns=ColumnNames1)\
+    ## Add column\
+    #print("Adding new column....")\
+    builderS["LABEL"]=name\
+\
+    #print(builderS)\
+    FinalDF_STEM= FinalDF_STEM.append(builderS)\
+\
+FinalDF=FinalDF_STEM.fillna(0)   \
+\
+\
+\
+\
+TrainDF, TestDF = train_test_split(FinalDF, test_size=0.3)\
+\
+## IMPORTANT - YOU CANNOT LEAVE LABELS ON THE TEST SET\
+## Save labels\
+TestLabels=TestDF["LABEL"]\
+#print(TestLabels)\
+## remove labels\
+## Make a copy of TestDF\
+CopyTestDF=TestDF.copy()\
+TestDF = TestDF.drop(["LABEL"], axis=1)\
+print(TestDF)\
+\
+## DF seperate TRAIN SET from the labels\
+TrainDF_nolabels=TrainDF.drop(["LABEL"], axis=1)\
+#print(TrainDF_nolabels)\
+TrainLabels=TrainDF["LABEL"]\
+#print(TrainLabels)\
+\
+\
+\
+\
+####################################################################\
+########################### Naive Bayes ############################\
+####################################################################\
+MyModelNB= MultinomialNB()\
+\
+MyModelNB.fit(TrainDF_nolabels, TrainLabels)\
+Prediction = MyModelNB.predict(TestDF)\
+print("\\nThe prediction from NB is:")\
+print(Prediction)\
+print("\\nThe actual labels are:")\
+print(TestLabels)\
+\
+\
+## confusion matrix\
+cnf_matrix = confusion_matrix(TestLabels, Prediction)\
+print("\\nThe confusion matrix is:")\
+print(cnf_matrix)\
+### prediction probabilities\
+## columns are the labels in alphabetical order\
+\
+print(np.round(MyModelNB.predict_proba(TestDF),2))\
+\
+## VIS\
+from sklearn import metrics \
+print(metrics.classification_report(TestLabels, Prediction))\
+print(metrics.confusion_matrix(TestLabels, Prediction))\
+\
+import seaborn as sns\
+sns.heatmap(cnf_matrix.T, square=True, annot=True, fmt='d', \
+            xticklabels=["environment", "policy"], yticklabels=["environment", "policy"])\
+plt.xlabel('True Label')\
+plt.ylabel('Predicted Label')\
+\
+\
+#############################################\
+###########  SVM ############################\
+#############################################\
+SVM_Model=LinearSVC(C=.01)\
+SVM_Model.fit(TrainDF_nolabels, TrainLabels)\
+\
+print("SVM prediction:\\n", SVM_Model.predict(TestDF))\
+print("Actual:")\
+print(TestLabels)\
+\
+SVM_matrix = confusion_matrix(TestLabels, SVM_Model.predict(TestDF))\
+print("\\nThe confusion matrix is:")\
+print(SVM_matrix)\
+print("\\n\\n")\
+\
+## VIS\
+sns.heatmap(SVM_matrix.T, square=True, annot=True, fmt='d', \
+            xticklabels=["environment", "policy"], yticklabels=["environment", "policy"])\
+plt.xlabel('True Label')\
+plt.ylabel('Predicted Label')}
