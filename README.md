@@ -49,3 +49,18 @@
 <p align="center">
   <img src="https://user-images.githubusercontent.com/71619071/147712102-30872e47-ab68-440d-af53-3740ccf87aea.png?raw=true" alt="Sublime's custom image"/>
 </p>
+
+**Process:**
+
+* Data Gathering 
+* Data Cleaning
+* EDA
+* Model Building
+  - Decision Trees
+  - Naive Bayes
+  - SVM
+  - Random Forest
+* Hyperparameters tuning
+* Model Assessment 
+* Get conclusion
+
