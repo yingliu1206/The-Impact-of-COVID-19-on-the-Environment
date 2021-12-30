@@ -60,7 +60,7 @@
   - Naive Bayes
   - SVM
   - Random Forest
-* Hyperparameters tuning
+* Hyperparameters Tuning
 * Model Assessment 
-* Get conclusion
+* Draw Conclusions
 
