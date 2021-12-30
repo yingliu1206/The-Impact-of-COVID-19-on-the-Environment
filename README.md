@@ -1,13 +1,13 @@
 # The-Impact-of-COVID-19-on-the-Environment
 * Environmental problems have always been an issue that cannot be ignored in the development process of all countries. However, the mode of development at the expense of the environment still exists. Take EU as an example. The picture below shows EU’s investment for environmental protection from 2006 to 2019. Obviously, both government and corporation investment for EP displayed a decreasing trend during the period, which reflects that they care less and less on the environmental protection.
 
-</p align="center">
+<p align="center">
   <img src="https://user-images.githubusercontent.com/71619071/147711779-8ce90928-64ba-48ab-b88b-0a2de431f502.png?raw=true" alt="Sublime's custom image"/>
 </p>
 
 * However, the related impacts of climate changes are terrible and disastrous. The picture below shows that nearly 821 million undernourished partly due to drought, 35 million people affected by flood, 2 million people displaced by weather-linked disease, and the like. All these facts have demonstrated that environmental protection is indeed imminent and in great need.
 
-</p align="center">
+<p align="center">
   <img src="https://user-images.githubusercontent.com/71619071/147711937-f9dd7fff-db01-475e-b421-dca063beda6d.png?raw=true" alt="Sublime's custom image"/>
 </p>
 
@@ -15,7 +15,7 @@
 
 * Research from the World Health Organization (WHO) shows that an estimated 4.2 to 7 million people die from air pollution worldwide every year and that nine out of 10 people breathe air that contains high levels of pollutants. In Africa, 258000 people died as a result of outdoor air pollution in 2017, up from 164000 in 1990, according to UNICEF. In Europe, a recent report from the EU’s environment agency showed that air pollution contributed to 400000 annual deaths in the EU in 2012. Besides air pollution, increased emissions of greenhouse gases have caused temperatures to rise. The climate crisis is warming the Arctic more than twice as fast as anywhere else on the planet. Seas are now rising an average of 3.2 mm per year globally, and are predicted to climb to a total of 0.2 to 2m by 2100. In the Arctic, the Greenland Ice Sheet poses the greatest risk for sea levels because melting land ice is the main cause of rising sea levels. These events and numbers constantly reminded the world that environmental protection requires more.
 
-</p align="center">
+<p align="center">
   <img src="https://user-images.githubusercontent.com/71619071/147711976-aca31b0d-bbb6-43c3-b156-89fb3a93374e.png?raw=true" alt="Sublime's custom image"/>
 </p>
 
