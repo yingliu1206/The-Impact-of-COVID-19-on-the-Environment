@@ -1,6 +1,7 @@
 # The-Impact-of-COVID-19-on-the-Environment
 * Environmental problems have always been an issue that cannot be ignored in the development process of all countries. However, the mode of development at the expense of the environment still exists. Take EU as an example. The picture below shows EU’s investment for environmental protection from 2006 to 2019. Obviously, both government and corporation investment for EP displayed a decreasing trend during the period, which reflects that they care less and less on the environmental protection.
-![alt text](http://url/to/img.png)
+![plot1](https://user-images.githubusercontent.com/71619071/147711779-8ce90928-64ba-48ab-b88b-0a2de431f502.png)
+
 
 * However, the related impacts of climate changes are terrible and disastrous. The picture below shows that nearly 821 million undernourished partly due to drought, 35 million people affected by flood, 2 million people displaced by weather-linked disease, and the like. All these facts have demonstrated that environmental protection is indeed imminent and in great need.
 
